@@ -1,0 +1,47 @@
+# 中间产物：都能由 src/ 里的脚本重新生成，不进版本库。
+# 尤其是 data/pdf（129MB）和 data/index/vectors.npy（132MB）——
+# 光这两个就把仓库撑到几百 MB，而 fetch_reports.py + index.py 能原样重建。
+
+# 抓下来的 48 份 PDF
+data/pdf/
+data/raw/
+
+# 解析结果与分块（parse.py 重跑）
+data/parsed/
+data/chunks.jsonl
+
+# BM25 / 向量索引（index.py 重跑；向量约 1.5 小时，分片断点续跑）
+data/index/
+
+# 被 answer_key2.py 取代的旧基准产物（留着做对照，但不进版本库）
+data/baseline.json
+
+# 改锚点扫法之前的旧基准。它是**错的**（把爱博 2025 一季度的数当成全年数，
+# README §4 记了这个坑）。它不是"另一个版本"，是已知错误的数据，
+# 留在库里早晚有人拿它当真值用，所以不收。
+data/answer_key.old.json
+
+# 模型缓存。所有脚本都写死 HF_HOME=D:\hf-cache，这里是次跑漏出来的残片
+# （16MB，真正的缓存在 D:\hf-cache，1.2GB）——纯垃圾，别提交
+hf-cache/
+
+# 跑批日志。装环境、下模型那些一次性过程的日志是噪音，只留向量构建的
+# ——它现在还在写，重建索引要一个半小时，这份日志是那次长跑的唯一记录。
+# （git 不允许"先忽略目录、再单独放行目录内文件"，所以这里忽略的是 *.log 而不是 logs/）
+logs/*.log
+!logs/vec_build.log
+
+# app.py 的 stderr。浏览器关标签页会掐断 SSE，以前这里会刷一屏 traceback，
+# 现在 Server.handle_error 吞掉了（见 src/app.py），退化成纯噪音
+logs/*.err
+
+__pycache__/
+*.pyc
+*.pyo
+
+# 截图临时件
+docs/shots/*.tmp.png
+
+# Windows
+Thumbs.db
+desktop.ini
